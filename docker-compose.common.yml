@@ -1,0 +1,62 @@
+#################################################################################
+# Copyright (c) 2014-2020 WANdisco
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Apache License, Version 2.0
+#
+################################################################################
+#
+# Note: while version 3.7 is technically compatible with Docker 18.06 and
+# higher, this project was tested with only Docker 18.09 as of 2019-08-06.
+#
+################################################################################
+
+version: "3.7"
+
+services:
+  debug:
+    image: ubuntu
+    command: ["tail", "-f", "/dev/null"]
+    working_dir: "/debug"
+    volumes:
+      - logging-livedata-ui:/debug/livedata-ui
+    networks:
+      - fusion
+
+# This service creates the One UI Server component to manage both zones.
+#
+# Note: this component can be run in either zone, so one is chosen arbitrarily
+
+  # LiveData UI
+  livedata-ui:
+    image: wandisco/livedata-ui:5.12.0
+    restart: unless-stopped
+    networks:
+      - fusion
+    ports:
+      - 8081:8081
+    env_file:
+      - "common.env"
+    volumes:
+      - logging-livedata-ui:/var/log/wandisco/
+      - fusion-livedata-ui-h2db:/h2db
+      - fusion-sandbox-hdp-etc-wandisco:/fusionConfig/sandbox-hdp
+      - fusion-s3-etc-wandisco:/fusionConfig/s3
+
+volumes:
+  # Named logging volume
+  logging-livedata-ui:
+
+  # h2db database for UI Server
+  fusion-livedata-ui-h2db:
+
+  fusion-sandbox-hdp-etc-wandisco:
+  fusion-s3-etc-wandisco:
+
+# Used for restarting ihc servers
+  fusion-sandbox-hdp-restart:
+  fusion-s3-restart:

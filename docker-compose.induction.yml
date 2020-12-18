@@ -1,0 +1,32 @@
+#################################################################################
+# Copyright (c) 2014-2019 WANdisco
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Apache License, Version 2.0
+#
+################################################################################
+#
+# Note: while version 3.7 is technically compatible with Docker 18.06 and
+# higher, this project was tested with only Docker 18.09 as of 2019-08-06.
+#
+################################################################################
+
+version: "3.7"
+
+services:
+  # This service performs the induction process as a Docker container job at launch.
+  induction:
+    image: wandisco/fusion-server-hcfs-asf-3.1.0:2.15.5.1-3860
+    networks:
+      - fusion
+    environment:
+      - INDUCTOR=fusion-server-sandbox-hdp
+      - INDUCTEE=fusion-server-s3
+      - INDUCTOR_PORT=8082
+      - INDUCTEE_PORT=8582
+      - INDUCTEE_REPLICATION_PORT=6944
+    command: /scripts/induction.sh
